@@ -1,7 +1,7 @@
 ---
 title: "HW4"
 author: "Arturo Casillas"
-date: "September 25, 2017"
+date: "September 26, 2017"
 output: 
   html_document:
     keep_md: true
@@ -24,10 +24,11 @@ a. Install the fivethirtyeight package.
 library("fivethirtyeight")
 ```
 
-b. + c. In the listing of Data sets in package 'fivethirtyeight,' assign the eighteenth data set to an object 'df.' 
+b. & c. In the listing of Data sets in package 'fivethirtyeight,' assign the eighteenth data set to an object 'df.' 
 
 
 ```{r no1B, echo=TRUE}
+#1.b.
 #Also, I received the code below from the README
 # To see a list of all data sets:
 #data(package = "fivethirtyeight")
@@ -35,17 +36,23 @@ b. + c. In the listing of Data sets in package 'fivethirtyeight,' assign the eig
 # To see a more detailed list of all data sets, see the package vignette:
 #vignette("fivethirtyeight", package = "fivethirtyeight")
 
+#I will try to list them here
+ls("package:fivethirtyeight")
+
+
+#1.c.
 #The 18th data set on the vignette is "college_recent_grads"
 ls("package:fivethirtyeight")[18]
 #given what no. 2 says below, I'm going with recent grads 
 df0<-comma_survey
 df<-college_recent_grads
-str(df)
+class(df)
 ```
 
 c. Use a more detailed list of the data sets to write out the URL in a comment to the related news story.
 
 ```{r no1C, echo=TRUE}
+# I am interpreting this as the URL on the vignette
 URL<-"http://fivethirtyeight.com/features/the-economic-guide-to-picking-a-college-major/"
 URL
 ```
@@ -91,6 +98,7 @@ b. Generate a count of each unique major_category in the data frame.
 #2.b.#
 #assign count of major_category to an object
 major_count <- table(df$major_category)
+major_count
 ```
 
 c. Make a barplot of major_count. Make sure to label the title

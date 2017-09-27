@@ -11,7 +11,7 @@
 
 <meta name="author" content="Arturo Casillas" />
 
-<meta name="date" content="2017-09-25" />
+<meta name="date" content="2017-09-26" />
 
 <title>HW4</title>
 
@@ -119,7 +119,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">HW4</h1>
 <h4 class="author"><em>Arturo Casillas</em></h4>
-<h4 class="date"><em>September 25, 2017</em></h4>
+<h4 class="date"><em>September 26, 2017</em></h4>
 
 </div>
 
@@ -140,52 +140,70 @@ $(document).ready(function () {
 # I already installed the package so I am including 
 library(&quot;fivethirtyeight&quot;)</code></pre>
 <ol start="2" style="list-style-type: lower-alpha">
-<li><ul>
-<li><ol start="3" style="list-style-type: lower-alpha">
-<li>In the listing of Data sets in package ‘fivethirtyeight,’ assign the eighteenth data set to an object ‘df.’</li>
-</ol></li>
-</ul></li>
+<li>&amp; c. In the listing of Data sets in package ‘fivethirtyeight,’ assign the eighteenth data set to an object ‘df.’</li>
 </ol>
-<pre class="r"><code>#Also, I received the code below from the README
+<pre class="r"><code>#1.b.
+#Also, I received the code below from the README
 # To see a list of all data sets:
 #data(package = &quot;fivethirtyeight&quot;)
 
 # To see a more detailed list of all data sets, see the package vignette:
 #vignette(&quot;fivethirtyeight&quot;, package = &quot;fivethirtyeight&quot;)
 
+#I will try to list them here
+ls(&quot;package:fivethirtyeight&quot;)</code></pre>
+<pre><code>##  [1] &quot;airline_safety&quot;           &quot;antiquities_act&quot;         
+##  [3] &quot;avengers&quot;                 &quot;bad_drivers&quot;             
+##  [5] &quot;bechdel&quot;                  &quot;biopics&quot;                 
+##  [7] &quot;bob_ross&quot;                 &quot;cand_events_20150114&quot;    
+##  [9] &quot;cand_events_20150130&quot;     &quot;cand_state_20150114&quot;     
+## [11] &quot;cand_state_20150130&quot;      &quot;classic_rock_raw_data&quot;   
+## [13] &quot;classic_rock_song_list&quot;   &quot;college_all_ages&quot;        
+## [15] &quot;college_grad_students&quot;    &quot;college_recent_grads&quot;    
+## [17] &quot;comic_characters&quot;         &quot;comma_survey&quot;            
+## [19] &quot;congress_age&quot;             &quot;cousin_marriage&quot;         
+## [21] &quot;daily_show_guests&quot;        &quot;democratic_bench&quot;        
+## [23] &quot;drinks&quot;                   &quot;drug_use&quot;                
+## [25] &quot;elo_blatter&quot;              &quot;endorsements&quot;            
+## [27] &quot;fandango&quot;                 &quot;fifa_audience&quot;           
+## [29] &quot;flying&quot;                   &quot;food_world_cup&quot;          
+## [31] &quot;goose&quot;                    &quot;hate_crimes&quot;             
+## [33] &quot;hiphop_cand_lyrics&quot;       &quot;hist_ncaa_bball_casts&quot;   
+## [35] &quot;hist_senate_preds&quot;        &quot;librarians&quot;              
+## [37] &quot;love_actually_adj&quot;        &quot;love_actually_appearance&quot;
+## [39] &quot;mad_men&quot;                  &quot;male_flight_attend&quot;      
+## [41] &quot;mlb_as_play_talent&quot;       &quot;mlb_as_team_talent&quot;      
+## [43] &quot;murder_2015_final&quot;        &quot;murder_2016_prelim&quot;      
+## [45] &quot;nba_draft_2015&quot;           &quot;nba_tattoos&quot;             
+## [47] &quot;nfl_fav_team&quot;             &quot;nfl_suspensions&quot;         
+## [49] &quot;nfltix_div_avgprice&quot;      &quot;nfltix_usa_avg&quot;          
+## [51] &quot;nflwr_aging_curve&quot;        &quot;nflwr_hist&quot;              
+## [53] &quot;nutrition_pvalues&quot;        &quot;police_deaths&quot;           
+## [55] &quot;police_killings&quot;          &quot;police_locals&quot;           
+## [57] &quot;pres_2016_trail&quot;          &quot;pres_commencement&quot;       
+## [59] &quot;pulitzer&quot;                 &quot;riddler_castles&quot;         
+## [61] &quot;riddler_castles2&quot;         &quot;san_andreas&quot;             
+## [63] &quot;senate_polls&quot;             &quot;steak_survey&quot;            
+## [65] &quot;tarantino&quot;                &quot;tennis_events_time&quot;      
+## [67] &quot;tennis_players_time&quot;      &quot;tennis_serve_time&quot;       
+## [69] &quot;tenth_circuit&quot;            &quot;trump_news&quot;              
+## [71] &quot;trump_twitter&quot;            &quot;unisex_names&quot;            
+## [73] &quot;US_births_1994_2003&quot;      &quot;US_births_2000_2014&quot;     
+## [75] &quot;weather_check&quot;</code></pre>
+<pre class="r"><code>#1.c.
 #The 18th data set on the vignette is &quot;college_recent_grads&quot;
 ls(&quot;package:fivethirtyeight&quot;)[18]</code></pre>
 <pre><code>## [1] &quot;comma_survey&quot;</code></pre>
 <pre class="r"><code>#given what no. 2 says below, I'm going with recent grads 
 df0&lt;-comma_survey
 df&lt;-college_recent_grads
-str(df)</code></pre>
-<pre><code>## Classes 'tbl_df', 'tbl' and 'data.frame':    173 obs. of  21 variables:
-##  $ rank                       : int  1 2 3 4 5 6 7 8 9 10 ...
-##  $ major_code                 : int  2419 2416 2415 2417 2405 2418 6202 5001 2414 2408 ...
-##  $ major                      : chr  &quot;Petroleum Engineering&quot; &quot;Mining And Mineral Engineering&quot; &quot;Metallurgical Engineering&quot; &quot;Naval Architecture And Marine Engineering&quot; ...
-##  $ major_category             : chr  &quot;Engineering&quot; &quot;Engineering&quot; &quot;Engineering&quot; &quot;Engineering&quot; ...
-##  $ total                      : int  2339 756 856 1258 32260 2573 3777 1792 91227 81527 ...
-##  $ sample_size                : int  36 7 3 16 289 17 51 10 1029 631 ...
-##  $ men                        : int  2057 679 725 1123 21239 2200 832 2110 12953 8407 ...
-##  $ women                      : int  282 77 131 135 11021 373 960 1667 2105 6548 ...
-##  $ sharewomen                 : num  0.121 0.102 0.153 0.107 0.342 ...
-##  $ employed                   : int  1976 640 648 758 25694 1857 2912 1526 76442 61928 ...
-##  $ employed_fulltime          : int  1849 556 558 1069 23170 2038 2924 1085 71298 55450 ...
-##  $ employed_parttime          : int  270 170 133 150 5180 264 296 553 13101 12695 ...
-##  $ employed_fulltime_yearround: int  1207 388 340 692 16697 1449 2482 827 54639 41413 ...
-##  $ unemployed                 : int  37 85 16 40 1672 400 308 33 4650 3895 ...
-##  $ unemployment_rate          : num  0.0184 0.1172 0.0241 0.0501 0.0611 ...
-##  $ p25th                      : num  95000 55000 50000 43000 50000 50000 53000 31500 48000 45000 ...
-##  $ median                     : num  110000 75000 73000 70000 65000 65000 62000 62000 60000 60000 ...
-##  $ p75th                      : num  125000 90000 105000 80000 75000 102000 72000 109000 70000 72000 ...
-##  $ college_jobs               : int  1534 350 456 529 18314 1142 1768 972 52844 45829 ...
-##  $ non_college_jobs           : int  364 257 176 102 4440 657 314 500 16384 10874 ...
-##  $ low_wage_jobs              : int  193 50 0 0 972 244 259 220 3253 3170 ...</code></pre>
+class(df)</code></pre>
+<pre><code>## [1] &quot;tbl_df&quot;     &quot;tbl&quot;        &quot;data.frame&quot;</code></pre>
 <ol start="3" style="list-style-type: lower-alpha">
 <li>Use a more detailed list of the data sets to write out the URL in a comment to the related news story.</li>
 </ol>
-<pre class="r"><code>URL&lt;-&quot;http://fivethirtyeight.com/features/the-economic-guide-to-picking-a-college-major/&quot;
+<pre class="r"><code># I am interpreting this as the URL on the vignette
+URL&lt;-&quot;http://fivethirtyeight.com/features/the-economic-guide-to-picking-a-college-major/&quot;
 URL</code></pre>
 <pre><code>## [1] &quot;http://fivethirtyeight.com/features/the-economic-guide-to-picking-a-college-major/&quot;</code></pre>
 <ol start="4" style="list-style-type: lower-alpha">
@@ -250,7 +268,25 @@ length(df[1,])</code></pre>
 </ol>
 <pre class="r"><code>#2.b.#
 #assign count of major_category to an object
-major_count &lt;- table(df$major_category)</code></pre>
+major_count &lt;- table(df$major_category)
+major_count</code></pre>
+<pre><code>## 
+##     Agriculture &amp; Natural Resources                                Arts 
+##                                  10                                   8 
+##              Biology &amp; Life Science                            Business 
+##                                  14                                  13 
+##         Communications &amp; Journalism             Computers &amp; Mathematics 
+##                                   4                                  11 
+##                           Education                         Engineering 
+##                                  16                                  29 
+##                              Health           Humanities &amp; Liberal Arts 
+##                                  12                                  15 
+## Industrial Arts &amp; Consumer Services                   Interdisciplinary 
+##                                   7                                   1 
+##                 Law &amp; Public Policy                   Physical Sciences 
+##                                   5                                  10 
+##            Psychology &amp; Social Work                      Social Science 
+##                                   9                                   9</code></pre>
 <ol start="3" style="list-style-type: lower-alpha">
 <li>Make a barplot of major_count. Make sure to label the title with something informative, label the x and y axis, and make it any color other than grey.</li>
 </ol>
