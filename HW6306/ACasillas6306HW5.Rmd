@@ -1,0 +1,162 @@
+---
+title: "HW5"
+author: "Arturo Casillas"
+date: "October 4, 2017"
+output: 
+  html_document:
+    keep_md: true
+---
+
+## Intro
+
+Problems 1.-3. are here. The link for 4. and the files on github is:
+
+
+https://github.com/ArturoCasillas/Acasillas-SMU-MSDS-homework
+
+
+#1. 
+
+a. First, import the yob2016.txt file into R so you can process it. Assign the resulting data frame to an object, df, that consists of three columns with human-readable column names for each.
+
+```{r no1A, echo=TRUE}
+#1.a.
+library(reshape2)
+getwd()
+df=read.table("C:/Users/acasi/Downloads/yob2016.txt", sep=";", header=FALSE)
+head(df)
+#Will add year for later
+names(df)=c("Name", "Sex", "No.of.Children.2016")
+
+```
+
+
+b. Display the summary and structure of df 
+
+```{r no1B, echo=TRUE}
+#1.b.
+
+#1.b.
+str(df)
+summary(df)
+
+
+```
+
+c. Your client tells you that there is a problem with the raw file. One name was entered twice and misspelled. The client cannot remember which name it is; there are thousands he saw! But he did mention he accidentally put three y's at the end of the name. Write an R command to figure out which name it is and display it.
+
+```{r no1C, echo=TRUE}
+#1.c.
+#some backround
+max(duplicated(df[,1])*1)
+
+##Here is the command to display the dublicated name
+df[grep("yyy", df[,1] ),1]
+
+```
+
+d. Upon finding the misspelled name, please remove this particular observation. Save the remaining dataset as an object: y2016
+
+```{r no1D, echo=TRUE}
+#1.d.
+y2016=df[-212,]
+```
+
+
+
+# 2.
+
+a. Like 1a, please import the yob2015.txt file into R. Look at the file before you do. Again, please give the dataframe human-readable column names. Assign the dataframe to y2015.
+
+```{r no2A, echo=TRUE}
+
+#2.a.
+df=read.table("C:/Users/acasi/Downloads/yob2015.txt", sep=",", header=FALSE)
+head(df)
+#Will add year for later
+names(df)=c("Name", "Sex", "No.of.Children.2015")
+str(df)
+
+```
+
+
+b. Display the last ten rows in the dataframe. Describe something you find interesting about these 10 rows. 
+
+```{r no2B, echo=TRUE}
+#2.b.
+tail(df, 10)
+
+##I find it strange that there are exactly 5 children with these names in each case
+
+```
+
+c. Merge y2016 and y2015 by your Name column; assign it to final. The client only cares about names that have data for both 2016 and 2015; there should be no NA values in either of your amount of children rows after merging.
+
+```{r no2C, echo=TRUE}
+#2.c.
+final=merge(df, y2016, by=c("Name","Sex"))
+str(final)
+#inner join also meets the both 2016 and 2015 criteria
+#Also, 2ds discussion plus the demands of number three suggests I merge by "Name" and "Sex", unlike what it says on the problem text.
+
+#check for missing values
+#max(is.na(final[,3]))
+#max(is.na(final[,4]))
+m=apply(final, c(1,2), is.na)
+max(m)
+
+```
+# 3.
+
+a. Create a new column called "Total" in final that adds the amount of children in 2015 and 2016 together. In those two years combined, how many people were given popular names?
+
+```{r no3A, echo=TRUE}
+#3.a.
+final$Total=final$No.of.Children.2015 + final$No.of.Children.2016
+
+#How many were given popular names?
+#summary(final$Total)
+#I'm going to assume this means how many children had names whose combined total count was above the mean
+sum(final$Total[final$Total>mean(final$Total)])
+
+```
+
+
+b. Sort the data by Total. What are the top 10 most popular names? 
+
+```{r no3B, echo=TRUE}
+
+#3.b.
+test=final[order(final$Total, decreasing=TRUE), ]
+head(test, 10)
+```
+
+c. The client is expecting a girl! Omit boys and give the top 10 most popular girl's names. Assign this to object girl.
+
+```{r no3C, echo=TRUE}
+#3.c.
+#part 1
+girl=head(test[(test$Sex == "F") , ], 10)
+#Note any problems with unisex names were resolved in the inner merge above on both "Name" and "Sex"
+#Also, I am taking "this object" to mean the 10 most popular girl names
+girl
+```
+
+
+d. Write these top 10 girl Names and their Totals to a CSV file called itsagirl.csv. Do not include row labels. Leave out columns other than Name and Total. 
+
+```{r no3D, echo=TRUE}
+#3.d.
+write.csv(girl[, c(1,5)], "itsagirl.csv", row.names = FALSE)
+
+#For precaution given the instructions
+write.csv(test[(test$Sex == "F"), c(1,5)], "itsagirl_all.csv", row.names = FALSE)
+```
+
+
+#4.
+
+This is a link to my GitHub repository where the files and codebook are contained:
+https://github.com/ArturoCasillas/Acasillas-SMU-MSDS-homework
+
+

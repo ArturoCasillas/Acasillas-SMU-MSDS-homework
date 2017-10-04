@@ -1,0 +1,41 @@
+Codebook of data
+
+#yob2016
+This raw file is a series of popular children’s names born in the year 2016 in the United States. 
+It consists of three columns with a first name, a gender, and the amount of children given that name.
+
+#y2016
+This is an R object created from 'yob2016' above.
+This was first read in as 'df' and then modified further into 'y2016'
+It contains three variables: Name, Sex, No.of.Children.2016
+
+#yob2015
+This raw file is a series of popular children’s names born in the year 2015 in the United States. 
+It consists of three columns with a first name, a gender, and the amount of children given that name.
+
+#df
+This is an R object created from 'yob2015' above.
+It contains three variables: Name, Sex, No.of.Children.2015
+
+#final
+This is 'y2016' and 'df' inner joned on Name and Sex.
+This has five variables: Name, Sex, No.of.Children.2015, No.of.Children.2016, Total
+Total is the sum of No.of.Children.2015 and No.of.Children.2016
+
+#m
+This is a data.frame of true and false values checking for NAs
+Looking back, storing this as an object might be inefficient
+
+#test
+This is the data.frame 'final' ordered by Total (greatest to least)
+This has five variables: Name, Sex, No.of.Children.2015, No.of.Children.2016, Total
+
+#girl
+This is a data.frame containing the 10 most popular girl names
+This has five variables: Name, Sex, No.of.Children.2015, No.of.Children.2016, Total
+
+#itsagirl
+This has two variables: Name, Total
+
+#itsagirl_all
+This has five variables: Name, Sex, No.of.Children.2015, No.of.Children.2016, Total
