@@ -1,0 +1,288 @@
+---
+title: "HW9"
+author: "Arturo Casillas"
+date: "October 30, 2017"
+output: 
+  html_document:
+  #  theme: 'readable'
+    keep_md: true
+---
+
+## Intro
+
+Problems 1 and 2 are here. The full tables after cleaning can be found in the appendix. The link for the files on github is:
+
+
+https://github.com/ArturoCasillas/Acasillas-SMU-MSDS-homework
+
+
+#1. Harry Potter Cast
+
+###a.-b. In the IMDB, there are listings of full cast members for movies. Navigate to http://www.imdb.com/title/tt1201607/fullcredits?ref_=tt_ql_1. Feel free to View Source to get a good idea of what the page looks like in code. Scrape the page with any R package that makes things easy for you. Of particular interest is the table of the Cast in order of crediting.
+
+I initalized the packages and saved the data into a data.frame object below. I only did very basic cleaning
+
+```{r no1_Init, echo=TRUE, message=FALSE}
+#1.a. I clicked on the links to view the data
+#     The cleaning will be 
+#install.packages("XML")
+library(XML)
+library(xml2)
+library(RCurl)
+library(rvest)
+library(knitr)
+
+#1.b. I will install the packages and import/scrape the data in a very basic way
+#      followed the Demo
+URL1<-getURL('http://www.imdb.com/title/tt1201607/fullcredits?ref_=tt_ql_1')
+page1<-read_html(URL1)
+table1<-html_table(html_nodes(page1, 'table'))
+
+#    Check out what I have to look at
+#str(table1)
+#    It appears the third 'node' is what I am after
+#    I know this from 1.a. when I looked at the htmls
+test<-data.frame(table1[3])
+str(test)
+
+```
+
+###c.Clean up the table
+
+#### -It should not have blank observations or rows, a row that should be column names, or just '.'
+
+#### -It should have intuitive column names (ideally 2 to start - Actor and Character)
+
+#### -In the film, Mr. Warwick plays two characters, which makes his row look a little weird. Please replace his character column with just "Griphook / Professor Filius Flitwick" to make it look better. . One row might result in "Rest of cast listed alphabetically" - remove this observation.
+
+Now that it is loaded, I save the Cast data set with minor cleaning
+
+```{r no1C_clean, echo=TRUE}
+
+#1.c.
+Cast<-data.frame(test[2:length(test[,2]), c(2,4)])
+names(Cast)<-c('Actor','Character')
+#str(Cast)
+#kable(head(Cast))
+head(Cast)
+tail(Cast)
+```
+
+I need to do more cleaning on the data.
+
+```{r no1C_clean2, echo=TRUE}
+#Clean the second column
+#tail(Cast)
+Cast$Character<-gsub('\n  ','',Cast$Character)
+Cast=Cast[!grepl('alphabetically:', Cast$Character),]
+
+#DIm, head and tail
+#dim(Cast)
+head(Cast)
+tail(Cast)
+```
+
+After basic cleaning, I fix Warick Davis' row
+
+```{r no1C_warwick, echo=TRUE}
+###Fix Warick Davis
+#find row
+warwick=Cast[grepl('/ ', Cast$Character),]
+#Create index to see rows I changed
+test.indexes<-c((grep('/', Cast$Character)-1):(grep('/', Cast$Character)+2))
+
+#Fix
+warwick=cbind.data.frame(  warwick[,1], trimws(strsplit(warwick[,2], '/')[[1]]))
+names(warwick)=names(Cast)
+#warwick
+
+## Merge back
+Cast=rbind.data.frame(Cast[1:(grep('/', Cast$Character)-1),],                       #Before warwick
+                      warwick,                                                      #New warwick
+                      Cast[(grep('/', Cast$Character)+1):length(Cast$Character),])  #After Warwick
+row.names(Cast)<-1:length(Cast$Actor)
+
+#Look at the rows I changed
+testR = Cast[test.indexes,]
+testR
+```
+
+
+###d. Split the Actor's name into two columns: FirstName and Surname. Keep in mind that some actors/actresses have middle names as well. Please make sure that the middle 2 names are in the FirstName column, in addition to the first name (example: given the actor Frank Jeffrey Stevenson, the FirstName column would say "Frank Jeffrey.")
+
+I will create a function to do this. 
+
+```{r no1D_test, echo=TRUE}
+#1.d.
+###Create new first and last name columns
+#create first and last name function
+#THis is to get the data in the form of a vector
+
+first.last <- function(x, sep=' '){
+  
+#x<-Cast$actor[80:86]
+D<-cbind(
+         rep( NA_character_, length(x)), 
+         rep( NA_character_, length(x))
+         )
+
+for(i in 1:length(x)){
+  
+  #i = 2
+  y<-strsplit(x[i], sep)[[1]]                           #split name
+  first<-paste(y[-length(y)], collapse=' ')             #get fitst name (not last name)
+  last<-y[length(y)]                                    #get last name
+  
+  D[i,]<-cbind(first, last)                             #combine
+                      }
+
+#format and output
+  out=data.frame(D)
+  names(out)<-c('FirstName','SurName')
+  out
+}
+
+```
+
+
+After creating a function to separate into first and last names, I will implement it on the cast data.
+
+```{r no1D_implement, echo=TRUE}
+#1.d. Continued
+testF<-cbind.data.frame(first.last(Cast$Actor), Cast$Character)
+#str(testF)
+Cast<-testF
+names(Cast)<-c('FirstName','SurName', 'Character')
+str(Cast)
+```
+
+####e. Present the first 10 rows of the data.frame() - It should have only FirstName, Surname, and Character columns.
+
+The first ten columns are below. The full table is also in the appendix.
+
+```{r no1E, echo=TRUE}
+
+head(Cast)
+
+```
+
+
+# 2.
+
+###a. On the ESPN website, there are statistics of each NBA player. Navigate to the San Antonio Spurs current statistics (likely http://www.espn.com/nba/team/stats/_/name/sa/san-antonio-spurs). You are interested in the Shooting Statistics table.
+
+###b. Scrape the page with any R package that makes things easy for you. There are a few tables on the page, so make sure you are targeting specifically the Shooting Statistics table.
+
+I will scrape the table like in 1a.-1b.
+
+```{r no2AB, echo=TRUE}
+
+#2.a.-b.
+#     Like the Demo
+URL2<-getURL('http://www.espn.com/nba/team/stats/_/name/sa/san-antonio-spurs')
+page2<-read_html(URL2)
+table2<-html_table(html_nodes(page2, 'table'))
+
+#    Check out what I have to look at
+#str(table2)
+#    It appears the third 'node' is what I am after
+#    I know this from 2.a. when I looked at the htmls
+test2<-data.frame(table2[2])
+str(test2)
+
+```
+
+
+###c. Clean up the table (You might get some warnings if you're working with tibbles)
+
+#### -You'll want to create an R data.frame() with one observation for each player. Make sure that you do not accidentally include blank rows, a row of column names, or the Totals row in the table as observations.
+
+#### -The column PLAYER has two variables of interest in it: the player's name and their position, denoted by 1-2 letters after their name. Split the cells into two columns, one with Name and the other Position.
+
+#### -Check the data type of all columns. Convert relevant columns to numeric. Check the data type of all columns again to confirm that they have changed!
+
+
+```{r no2C_basic, echo=TRUE}
+#2.c.
+##Get Names and remove nonsense first rows
+names(test2)=test2[2,]
+shootStats<-data.frame(test2[3:(length(test2[,2]) - 1), ])
+
+#Better Names
+names(shootStats)<-   #'Player'
+  c('Player', 'FG.Made', 'FG.Attempt', 'FG.Percent', 'FG3P.Made', 
+    'FG3P.Attempt','FG3P.Percent', 'FT.Made', 'FT.Attmempt',
+    'FT.Percent', 'FG2P.Made', 'FG2P.Attempt','FG2P.Percent',
+    'Points.per.Sot', 'Adj.FG.Percent');
+row.names(shootStats)<-1:13
+```
+
+Now to separate player and position in the first column
+
+```{r no2C_sep, echo=TRUE}
+#Separate player and position
+#I will recycle my earlier funciton but I have to change the names
+testP<-first.last(shootStats[,1], sep=',')
+names(testP)=c('Name', 'Position')
+shootStats=cbind.data.frame(testP, shootStats[,-1])
+```
+
+Now to convert character columns to numeric
+
+```{r no2C_num, echo=TRUE}
+###Convert character to numeric
+#CHeck shootStats
+str(shootStats)
+
+#use apply() function
+m<-apply(shootStats[,-c(1:2)], 2, as.numeric)
+
+#merge back
+shootStats=cbind.data.frame(shootStats[,c(1:2)], m)
+
+#Check shootStats again
+str(shootStats)
+head(shootStats)
+
+```
+
+###d. Create a colorful bar chart that shows the Field Goals Percentage Per Game for each person. It will be graded on the following criteria.
+
+#### -Informative Title, centered
+
+#### -Relevant x and y axis labels (not simply variables names!)
+
+#### -Human-readable axes with no overlap (you might have to flip x and y to fix that). Note: You do not have to convert the decimal to a percentage.
+
+#### -Color the columns by the team member's position (so, all PF's should have the same color, etc.)
+
+I can use ggplot to accomplish this
+
+```{r, no2e}
+# BarPlot #
+library(ggplot2)
+
+ggplot(dat=shootStats, aes(x=Name, y=FG2P.Percent, fill=Position)) + 
+  geom_bar(stat='identity') + coord_flip()  + theme_minimal() +                             #Format
+  ggtitle("Plot of Field Goal Percentage \n per Player per Game") +                         #Title
+  theme(plot.title = element_text(hjust = 0.5)) +                                           #Center Title
+  theme(legend.position = c(0.9, 0.5)) +                                                    #Legend Position
+  xlab("Player Name") + ylab("Field Goal % per Game") +                                     #axis labels
+  scale_fill_manual(values=c("#000000", "#005511", "#000099", "#777777", "#551100")) #+     #Manual set colors
+  #scale_color_gradient(low = "#00000000", high = "#0091ff")
+```
+
+This is a link to my GitHub repository where the files and codebook are contained:
+https://github.com/ArturoCasillas/Acasillas-SMU-MSDS-homework
+
+#Appendix
+
+Full Cast Data
+```{r}
+kable(Cast)
+```
+
+Full Shooting Statistics Data
+```{r}
+kable(shootStats)
+```
