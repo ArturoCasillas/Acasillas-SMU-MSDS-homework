@@ -1,0 +1,197 @@
+---
+title: "ACasillas6306HW10"
+author: "Arturo Casillas"
+date: "November 6, 2017"
+output: 
+  html_document:
+    keep_md: true
+---
+
+
+###1. Mental Health Clinics
+
+####a. This data set is a survey of every known healthcare facility that offers mental health services in the United States in 2015. Navigate to https://datafiles.samhsa.gov/study-dataset/national-mental-health-services-survey-2015-n-mhss-2015-ds0001-nid17098 and select the R download. Look through the codebook PDF for an explanation on certain variables. Upon opening the RDA file, the data set should be inserted into your global environment, which you can then reference.
+
+I loaded it from the dropdown menus and used the str() function to look at it (not included).
+
+```{r, echo=TRUE}
+
+load("C:/Users/acasi/Downloads/N-MHSS-2015-DS0001-data-r.rda")
+#str(mh2015_puf)
+
+
+```
+
+####b. Please create code which lists the State abbreviations without their counts, one abbreviation per State value. It does not have to in data frame format. A vector is fine.
+
+I did it two ways:
+
+```{r, echo=TRUE}
+
+#As long as we are just looking at a list of state abbreviations and not a different object...
+#Here are two different ways of getting the list
+levels(mh2015_puf$LST)
+#This is the more robust way in case the data set changes
+unique(mh2015_puf$LST)
+
+```
+
+####c. Filter the data.frame from 1A. We are only interested in the Veterans Administration (VA) medical centers in the mainland United States-create a listing of counts of these centers by state, including only mainland locations. Alaska, Hawaii, and U.S. territories should be omitted. DC, while not a state, is in the mainland, so it should remain included. Convert this to data.frame()
+
+I create filter vectors of TRUE/FALSE.
+
+```{r, echo=TRUE}
+
+###Filter
+
+F1= trimws(mh2015_puf$LST) %in% c('AS', 'GU', 'PR', 'VI', 'HI', 'AK' )
+#F1[1:10]
+
+#I am going to filter by FACILITYTYPE not by PUBLICAGENCY
+#unique(mh2015_puf$FACILITYTYPE)
+F2= grepl('(VAMC)', mh2015_puf$FACILITYTYPE )
+#F2[1:10]
+
+#Apply filters
+MHreduced<-mh2015_puf[F2 & !F1, ]
+
+```
+
+Below, I test whether they worked
+
+```{r, echo=TRUE}
+#Original dimensions
+dim(mh2015_puf)
+#Reduced dimensions
+dim(MHreduced)
+
+#No need to convert to a data.frame
+class(MHreduced)
+
+```
+
+####d. Create a ggplot barchart of this filtered data set. Vary the bar's colors by what State it has listed. Give it an appropriately professional title that is centered. Make sure you have informative axis labels. The State axis should be readable, not layered over each other. You're welcome to have a legend or not.
+
+First, I used tapply() to put the data in a small enough objsect that can be read easily by ggplot(). Then, I created a vector of colors from the colors() list of names.
+
+```{r, echo=TRUE, fig.height=11.5}
+
+##Barplot
+
+#I'm going to use tapply to define a dataset that can be easily red by ggplot
+stateFREQ<-data.frame(tapply(MHreduced$CASEID, MHreduced$LST, function(y) sum(!is.na(y), na.rm=TRUE)))
+#trimws(row.names(stateFREQ))
+stateFREQ<-cbind.data.frame('State'=trimws(row.names(stateFREQ)), 'Freq'=stateFREQ[,1])
+stateFREQ<-stateFREQ[!(stateFREQ$State %in% c('AS', 'GU', 'PR', 'VI', 'HI', 'AK' )),]
+str(stateFREQ)
+
+library(ggplot2)
+
+#Define color vector
+c=colors()
+#Below is a relatively parsimonious way to get 50+ colors that are all visible
+c1=c[grepl('1', c) & !grepl('gray', c) & !grepl('grey', c) & !grepl('gold', c) & !grepl('corn', c)
+     & !grepl('light', c) & !grepl('white', c) & !grepl('orchid', c) & !grepl('lavender', c)
+     & !grepl('wood', c) & !grepl('khaki', c) & !grepl('ivory', c) & !grepl('snow', c)
+     & !grepl('tan', c) & !grepl('azure', c) & !grepl('honeydew', c) & !grepl('shell', c)]
+```
+
+Now for the actual plot
+
+```{r, echo=TRUE}
+#use ggplot with c1 as color vector 
+p<-ggplot(data=stateFREQ, aes(x=State, y=Freq)) + geom_bar(stat="identity", fill=c1[1:48]) + ggtitle('Chart') 
+p<- p +   labs(title="Barplot of VAMC Facilities per State") + xlab("State") + ylab("Number of Veterans Administration Health Facilities")
+p<- p  + theme_minimal() + theme(plot.title = element_text(hjust = 0.5), axis.text.y = element_text(size=8.5)) + coord_flip()
+#p<- p  + theme_minimal() + theme(plot.title = element_text(hjust = 0.5)) + coord_flip()
+p
+
+#North Dakota has no VAMC facilities so I get a warning that it is missing
+```
+
+###2. Cleaning and Bringing in New Features (60%)
+
+####a. This graph (1D) might be somewhat misleading, as bigger states may have more hospitals, but could be more sparsely located. Read statesize.csv into your R environment. This contains essentially a vector of square miles for each state. In trying to merge it with your data.frame() from 1C, you find that they don't match. Use paste() on your LST column in 1C to see what the matter is, and write what you observe in a comment.
+
+I take it from what I saw above that the leading and trailing blanks will prevent the merge
+
+```{r, echo=TRUE}
+
+#Read data
+statesize<-read.csv("C:/Users/acasi/Downloads/statesize.csv")
+
+#Try to merge
+MHreducedS<-merge(MHreduced, statesize, by.x = 'LST', by.y = 'Abbrev', all.x = TRUE)
+tail(MHreducedS)[142:140]
+#use paste to see the exact text value of LST
+ptest=paste(MHreduced$LST, sep=';')
+ptest2=paste(statesize$Abbrev, sep=';')
+ptest[1:10]
+ptest2[1:10]
+
+```
+
+Indeed, the two variables are not identical due to leading and trailing blanks
+
+####b. Correct the problem with the LST column using any method in R that is programmatic and easily understandable. Once you have made these state abbreviations identical to statesize.csv's Abbrev column, merge the data.frame() from 1C and statesize.csv in order to add size information.
+
+I'll just replace the variable with a trimws() version of itself and remerge
+
+```{r, echo=TRUE}
+
+#2.b.
+#I used trimws to remove the leading and trailing spaces from LST
+MHreduced$LST=trimws(MHreduced$LST)
+
+#double check
+unique(statesize$Abbrev)
+sort(unique(MHreduced$LST))
+#Also, I notice that statesize does not have DC
+
+#Remerge
+MHreducedS2<-merge(MHreduced, statesize, by.x = 'LST', by.y = 'Abbrev', all.x = TRUE)
+#check
+tail(MHreducedS)[142:140]
+
+```
+
+####c. Calculate a new variable in your combined data.frame() which indicates the VA hospitals per thousand square miles.
+
+The way the data is structured, the new variable cannot be the total count of facilities per 1000 square miles, but a variable that will allow me to calculate that later per a grouping of my choice.
+
+```{r, echo=TRUE}
+
+#This does not indicate the number of VA hospitals per thousand miles inasmuch as it lets me calculate it via summation
+MHreducedS2$HospPKM <- 1*1000/MHreducedS2$SqMiles
+
+```
+
+####d. Create another ggplot which considers the VAs per square thousand miles, rather than just frequency.
+##### Make sure the State axis is readable, like before. Change the title and axes as appropriate.
+##### Modify the ggplot syntax to make your bars in descending order (there are StackOverflow topics for this, and I have demonstrated how in Live Coding in prior classes).
+##### Color-code the bars based on Region (see the merged data.frame)-however, change the color scheme from the default. Any set of colors is fine, so long as it is readable.
+##### Keep the legend-you should have four regions and therefore four colors.
+
+Once again, first tapply(), then ggplot.
+
+```{r, echo=TRUE, fig.height=11.5}
+
+#Once again, use tapply to be easily read by ggplot2
+Test=data.frame(tapply(MHreducedS2$HospPKM, MHreducedS2$LST, function(y) sum(y, na.rm=TRUE)))
+Test<-cbind.data.frame('State'=trimws(row.names(Test)), 'Freq'=Test[,1])
+Test<-Test[!(Test$State %in% c('AS', 'GU', 'PR', 'VI', 'HI', 'AK' )),]
+str(Test)
+
+
+#Now use ggplot again
+p2<-ggplot(data=Test, aes(x=State, y=Freq)) + geom_bar(stat="identity", fill=c1[1:48]) + ggtitle('Chart') 
+p2<- p2 +   labs(title="Barplot of VAMC Facilities per State per Thousand Square Miles") + xlab("State") + ylab("Number of Veterans Administration Health Facilities per 1000 Miles")
+p2<- p2  + theme_minimal() + theme(plot.title = element_text(hjust = 0.5), axis.text.y = element_text(size=8.5)) + coord_flip()
+#p<- p  + theme_minimal() + theme(plot.title = element_text(hjust = 0.5)) + coord_flip()
+p2
+
+```
+
+####e. What patterns do you see? By this metric, is there any region that seems relatively high for VA medical centers per thousand square miles? How about low? Given these data, what advice might you give your boss before you start modeling (and why)?
+
+Rhode Island seems to be high in VA medical centers per thousand miles while Wyoming seems to be relatively low in the same number. I think that both are related to each having either relatively high or low are in square miles per its population. Rhode Island has low area with a decent size population, while Wyoming has a high area per its low population.
