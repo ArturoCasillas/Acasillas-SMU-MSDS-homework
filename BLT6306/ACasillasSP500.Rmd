@@ -76,3 +76,5 @@ lines(volest2, type="l",col="red")
 # TODO: Add connected line segments for volest3 with the parameters: type="l",col="blue"
 lines(volest3, type="l",col="blue")
 ```
+
+The large the decay factor, the smoother the graph of the volatility measure is. With a larger volatility factor, the data still fluctuates, just less violently.
