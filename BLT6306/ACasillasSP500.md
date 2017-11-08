@@ -106,3 +106,6 @@ lines(volest3, type="l",col="blue")
 ```
 
 ![](ACasillasSP500_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+
+The large the decay factor, the smoother the graph of the volatility measure is. With a larger volatility factor, the data still fluctuates, just less violently.
